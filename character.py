@@ -21,9 +21,6 @@ class Character(object):
     def get_n_dice(self,number):
         self._n_dice+=number
 
-    def end_turn(self):
-        return True
-    
     def hp_change(self,number):
         if self._hp - number >0:
             self._hp -= number
@@ -35,6 +32,13 @@ class Character(object):
 
     def get_hp(self):
         return self._hp
+
+    def get_actions(self):
+        return self._action
+    
+    def reduce_actions(self,number = 1):
+        if self._action - number >= 0:
+            self._action -= number
 
 class Knight(Character):
 
