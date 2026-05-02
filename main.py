@@ -1,4 +1,22 @@
 from character import Character, Knight
+import math
+
+
+def enemy_logic(enemy):
+    """enemy logic with calculating good moves"""
+    possibleActions = enemy.get_actions()
+
+    bestAction = None
+    bestScore = -math.inf
+
+    for action in possibleActions:
+        pass
+
+def simulate():
+    pass
+
+def scoreState():
+    pass
 
 player = Knight(10)
 enemy = Knight(10)
