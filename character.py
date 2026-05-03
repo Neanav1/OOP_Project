@@ -20,14 +20,18 @@ class Character(object):
         self._n_dice-=self._n_dice_to_use
 
     #uses dice out of available list of dices
-    def use_dices(self):
+    def use_dices(self,index):
         """uses dice out of available list of dices"""
         pass
 
-    #geting more dices
-    def get_n_dice(self,number):
-        """geting more dices"""
+    #add more dices
+    def add_n_dice(self,number):
+        """add more dices"""
         self._n_dice+=number
+
+    def get_n_dice(self):
+        """returns number of dices avalable"""
+        return self._n_dice
 
     #change health positive int is damaging and negative int is healing
     def hp_change(self,number):
@@ -93,20 +97,23 @@ class Knight(Character):
 class Actions(object):
 
     def __init__(self,name):
-        self.name = name     
+        self.name = name 
+
+    def action():
+        return None    
 
 class BasicStrike(Actions):
     def __init__(self, name):
         super().__init__(name)
 
-    def damage(self,dice):
+    def action(self,dice):
         return 1*dice
 
 class Shield(Actions):
     def __init__(self, name):
         super().__init__(name)
 
-    def shield(self,dice):
+    def action(self,dice):
         return 1*dice
 
 class EndTurn(Actions):

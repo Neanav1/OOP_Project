@@ -1,16 +1,25 @@
 from character import Character, Knight
-import math
 
-
-def enemy_logic(enemy):
+def enemy_logic(enemy,player):
     """enemy logic with calculating good moves"""
     possibleActions = enemy.get_actions()
 
     bestAction = None
-    bestScore = -math.inf
+    bestScore = -9999
 
-    for action in possibleActions:
-        pass
+    currentState = {"enemyHP" : enemy.get_hp(),
+                    "enemyShiled" : enemy.get_shield()
+                    "enemyActions" : }
+
+    for name , action in possibleActions:
+        future = simulate(action)
+        score = scoreState(future)
+
+        if score > bestScore:
+            bestScore = score
+            bestAction = action
+
+    return bestAction
 
 def simulate():
     pass
