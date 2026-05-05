@@ -33,7 +33,7 @@ class Character:
 
     def take_damage(self, damage):
         """Damage shield first, then HP."""
-        if self._shield >= damage:
+        if int(self._shield) >= int(damage):
             self._shield -= damage
         else:
             remaining_damage = damage - self._shield
@@ -84,11 +84,13 @@ class Character:
         return self._available_actions
 
     def greet(self):
+        print("------------------------------------------")
         print(f"HP: {self._hp}")
         print(f"Shield: {self._shield}")
         print(f"Action points: {self._action_points}")
         print(f"Dice left to roll: {self._dice_to_roll}")
         print(f"Rolled dice: {self._rolls}")
+        print("------------------------------------------")
 
 
 class Knight(Character):

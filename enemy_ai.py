@@ -33,7 +33,7 @@ def enemy_logic(enemy, player):
 
         else:
             for dice_index in range(len(current_state["enemyRolls"])):
-                future_state = simulate(current_state, action_object, dice_index)
+                future_state = simulate(current_state, action_object, 0)
                 score = score_state(current_state, future_state)
 
                 if score > best_score:
