@@ -125,7 +125,6 @@ def perform_enemy_action(enemy, player, action_name, dice_index):
 
     enemy.reduce_action_points(1)
 
-
 def enemy_turn(enemy, player):
     print("\n--- Enemy Turn ---")
 
