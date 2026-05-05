@@ -5,6 +5,7 @@ def player_turn(enemy,player):
     dices = int(input("How many dices would you like to use: "))
     while player.get_action_points() > 0:
         player.roll_dices(dices)
+        print("--- Players Turn ---")
         player.greet()
         count = 0
         actions = {}
@@ -16,8 +17,7 @@ def player_turn(enemy,player):
         dice_ID = int(input("Which dice do you want to use: "))
         value , target = actions[action_id].action(player.get_rolls()[dice_ID-1])
         if target == "End":
-            player.add_action_points()
-            player.add_dice_to_roll()
+            break
         if target == "Enemy":
             if enemy.get_shield() >= value:
                 enemy.add_shield(-value)
@@ -28,18 +28,33 @@ def player_turn(enemy,player):
                 player.use_dice(dice_ID-1)
         if target == "Self":
             player.add_shield(value)
-            player.add_action_points(-1)
+            player.add_action_points(-1)    
             player.use_dice(dice_ID-1)
 
 player = Knight(10)
 enemy = Knight(10)
 
+while player.get_hp() > 0 and enemy.get_hp() > 0:
+    player_turn(enemy, player)
 
-while player.get_hp() > 0 or enemy.get_hp() >0  :
-      player_turn(enemy,player)
+    if enemy.get_hp() <= 0:
+        break
 
-      enemy_turn(enemy,player)
+    enemy_turn(enemy, player)
 
+    if player.get_hp() <= 0:
+        break
+
+    player.add_action_points(1)
+    player.add_dice_to_roll(1)
+
+    enemy.add_action_points(1)
+    enemy.add_dice_to_roll(1)
+
+if player.get_hp()<= 0:
+    print("You lost")
+if enemy.get_hp()<=0:
+    print("You win")
         
         
 

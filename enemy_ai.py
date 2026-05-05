@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 
 def enemy_logic(enemy, player):
     current_state = {
@@ -5,13 +7,17 @@ def enemy_logic(enemy, player):
         "enemyShield": enemy.get_shield(),
         "enemyActionPoints": enemy.get_action_points(),
         "enemyDiceToRoll": enemy.get_dice_to_roll(),
-        "enemyRolls": enemy.get_rolls(),
+
+        # IMPORTANT: use .copy() so simulate does not delete real dice
+        "enemyRolls": enemy.get_rolls().copy(),
 
         "playerHP": player.get_hp(),
         "playerShield": player.get_shield(),
         "playerActionPoints": player.get_action_points(),
         "playerDiceToRoll": player.get_dice_to_roll(),
-        "playerRolls": player.get_rolls()
+
+        # IMPORTANT: copy player rolls too
+        "playerRolls": player.get_rolls().copy()
     }
 
     possible_actions = enemy.get_available_actions()
@@ -33,7 +39,10 @@ def enemy_logic(enemy, player):
 
         else:
             for dice_index in range(len(current_state["enemyRolls"])):
-                future_state = simulate(current_state, action_object, 0)
+
+                # IMPORTANT: use dice_index, not 0
+                future_state = simulate(current_state, action_object, dice_index)
+
                 score = score_state(current_state, future_state)
 
                 if score > best_score:
@@ -45,7 +54,8 @@ def enemy_logic(enemy, player):
 
 
 def simulate(current_state, action_object, dice_index):
-    future_state = current_state.copy()
+    # IMPORTANT: deepcopy protects lists inside the dictionary
+    future_state = deepcopy(current_state)
 
     if action_object.name == "End Turn":
         future_state["enemyActionPoints"] = 0
@@ -95,9 +105,6 @@ def score_state(current_state, future_state):
 
     score += future_state["enemyShield"] * 2
 
-    if len(current_state["enemyRolls"]) == 0:
-        score += 20
-
     return score
 
 
@@ -108,10 +115,19 @@ def perform_enemy_action(enemy, player, action_name, dice_index):
     if action_name == "End_turn":
         print("Enemy ends the turn.")
         enemy.reduce_action_points(enemy.get_action_points())
+        enemy.add_action_points(1)
         enemy.add_dice_to_roll(1)
         return
 
+    if dice_index is None:
+        print("Enemy tried to use an action without a dice.")
+        return
+
     dice = enemy.use_dice(dice_index)
+
+    if dice is None:
+        print("Enemy tried to use an invalid dice.")
+        return
 
     result, target = action_object.action(dice)
 
@@ -125,21 +141,26 @@ def perform_enemy_action(enemy, player, action_name, dice_index):
 
     enemy.reduce_action_points(1)
 
+
 def enemy_turn(enemy, player):
     print("\n--- Enemy Turn ---")
 
     if len(enemy.get_rolls()) == 0 and enemy.get_dice_to_roll() > 0:
         enemy.roll_dices(enemy.get_dice_to_roll())
 
-    print("Enemy state before move:")
-    enemy.greet()
+    print("Enemy rolls before choosing:", enemy.get_rolls())
 
-    while enemy.get_action_points() > 0:
-        if len(enemy.get_rolls()) == 0:
-            break
+    if len(enemy.get_rolls()) == 0:
+        print("Enemy has no dice, ending turn.")
+        enemy.reduce_action_points(enemy.get_action_points())
+        return
 
+    while enemy.get_action_points() > 0 and len(enemy.get_rolls()) > 0:
         action_name, dice_index = enemy_logic(enemy, player)
         perform_enemy_action(enemy, player, action_name, dice_index)
 
         if action_name == "End_turn":
             break
+    
+    enemy.greet()
+    print("\n")
