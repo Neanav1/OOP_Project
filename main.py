@@ -1,4 +1,5 @@
 from character import Character, Knight
+from enemy_ai import enemy_turn
 
 player = Knight(10)
 enemy = Knight(10)
