@@ -4,6 +4,10 @@ from enemy_ai import enemy_turn
 player = Knight(10)
 enemy = Knight(10)
 
+#this will do the ai_turns
+enemy_turn(enemy,player)
+
+
 while player.get_hp() > 0 or enemy.get_hp() >0  :
     
     player.greet()
