@@ -121,7 +121,7 @@ class BasicSword(Item):
     def __init__(self, name, requirement):
         super().__init__(name, requirement)
 
-    
+   
     
 
 class Action:
