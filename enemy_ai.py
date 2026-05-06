@@ -1,5 +1,5 @@
 from copy import deepcopy
-
+import random
 
 def enemy_logic(enemy, player):
     current_state = {
@@ -89,21 +89,29 @@ def simulate(current_state, action_object, dice_index):
 
 
 def score_state(current_state, future_state):
+    characters = ["defensive","agressive"]
+    char = random.randint(0,len(characters)-1)
+    current_char = characters[char]
+    if current_char == "defensive":
+        values = [0.8,1,2]
+    elif current_char == "agressive":
+        values = [1.2,0.8]
+
     score = 0
 
     if future_state["playerHP"] <= 0:
         score += 1000
 
     damage_done = current_state["playerHP"] - future_state["playerHP"]
-    score += damage_done * 20
+    score += damage_done * 20 * values[0]
 
     shield_damage = current_state["playerShield"] - future_state["playerShield"]
-    score += shield_damage * 5
+    score += shield_damage * 5 * values[0]
 
     shield_gained = future_state["enemyShield"] - current_state["enemyShield"]
-    score += shield_gained * 10
+    score += shield_gained * 10 * values[1]
 
-    score += future_state["enemyShield"] * 2
+    score += future_state["enemyShield"] * 2 * values[0]
 
     return score
 

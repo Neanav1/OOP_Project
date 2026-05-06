@@ -13,13 +13,21 @@ class Character:
             "Shield": Shield("Shield"),
             "End_turn": EndTurn("End Turn")
         }
+        self._equipment = []
+    
+    def equipt(self,item):
+        self._equipment.append(item)
+
+    def unequipt(self,item):
+        self._equipment.remove(item)
+
 
     def roll_dices(self, number=1):
         """Rolls a number of dice and stores the results."""
         if number > self._dice_to_roll:
             number = self._dice_to_roll
 
-        for _ in range(number):
+        for i in range(number):
             self._rolls.append(random.randint(1, 6))
 
         self._dice_to_roll -= number
@@ -97,6 +105,24 @@ class Knight(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
 
+class Item:
+    
+    def __init__(self,name,requirement):
+        self.name = name
+        self.requirement = requirement
+        self.action_name = ""
+        self.action = None
+
+    def get_action(self):
+        return self.action_name , self.action
+
+class BasicSword(Item):
+
+    def __init__(self, name, requirement):
+        super().__init__(name, requirement)
+
+    
+    
 
 class Action:
     def __init__(self, name):

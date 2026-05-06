@@ -31,8 +31,8 @@ def player_turn(enemy,player):
             player.add_action_points(-1)    
             player.use_dice(dice_ID-1)
 
-player = Knight(10)
-enemy = Knight(10)
+player = Knight(25)
+enemy = Knight(25)
 
 while player.get_hp() > 0 and enemy.get_hp() > 0:
     player_turn(enemy, player)
