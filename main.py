@@ -1,4 +1,4 @@
-from character import Character, Knight
+from character import Character, Knight, BasicSword
 from enemy_ai import enemy_turn
 def player_turn(enemy,player):
     player.greet()
@@ -33,6 +33,9 @@ def player_turn(enemy,player):
 
 player = Knight(25)
 enemy = Knight(25)
+player.equipt(BasicSword("Sword",None))
+enemy.equipt(BasicSword("Sword",None))
+
 
 while player.get_hp() > 0 and enemy.get_hp() > 0:
     player_turn(enemy, player)

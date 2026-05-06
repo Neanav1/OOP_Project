@@ -14,13 +14,15 @@ class Character:
             "End_turn": EndTurn("End Turn")
         }
         self._equipment = []
+        self.level = 1
     
     def equipt(self,item):
         self._equipment.append(item)
+        name , action = item.get_action()
+        self.add_avalable_action(name,action)
 
     def unequipt(self,item):
         self._equipment.remove(item)
-
 
     def roll_dices(self, number=1):
         """Rolls a number of dice and stores the results."""
@@ -91,6 +93,9 @@ class Character:
     def get_available_actions(self):
         return self._available_actions
 
+    def add_avalable_action(self,name,action):
+        self._available_actions[name] = action
+
     def greet(self):
         print("------------------------------------------")
         print(f"HP: {self._hp}")
@@ -105,9 +110,11 @@ class Knight(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
 
+
+#Items
 class Item:
     
-    def __init__(self,name,requirement):
+    def __init__(self,name,requirement = None):
         self.name = name
         self.requirement = requirement
         self.action_name = ""
@@ -120,8 +127,10 @@ class BasicSword(Item):
 
     def __init__(self, name, requirement):
         super().__init__(name, requirement)
+        self.action_name = "Basic_Strike"
+        self.action = BasicStrike("Basic Strike")
 
-   
+    
     
 
 class Action:
