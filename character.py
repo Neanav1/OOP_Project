@@ -139,12 +139,6 @@ class BasicSword(Item):
         self.action_name = "Basic_Strike"
         self.action = BasicStrike("Basic Strike")
 
-class BasicShield(Item):
-
-    def __init__(self, name, requirement=None):
-        super().__init__(name, requirement)
-        self.action_name = "Shield"
-        self.action = Shield("Shield")
     
     
 #Actions
