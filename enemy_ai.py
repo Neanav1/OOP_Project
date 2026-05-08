@@ -8,7 +8,6 @@ def enemy_logic(enemy, player):
         "enemyActionPoints": enemy.get_action_points(),
         "enemyDiceToRoll": enemy.get_dice_to_roll(),
 
-        # IMPORTANT: use .copy() so simulate does not delete real dice
         "enemyRolls": enemy.get_rolls().copy(),
 
         "playerHP": player.get_hp(),
@@ -16,7 +15,6 @@ def enemy_logic(enemy, player):
         "playerActionPoints": player.get_action_points(),
         "playerDiceToRoll": player.get_dice_to_roll(),
 
-        # IMPORTANT: copy player rolls too
         "playerRolls": player.get_rolls().copy()
     }
 
@@ -40,7 +38,6 @@ def enemy_logic(enemy, player):
         else:
             for dice_index in range(len(current_state["enemyRolls"])):
 
-                # IMPORTANT: use dice_index, not 0
                 future_state = simulate(current_state, action_object, dice_index)
 
                 score = score_state(current_state, future_state)
@@ -54,7 +51,6 @@ def enemy_logic(enemy, player):
 
 
 def simulate(current_state, action_object, dice_index):
-    # IMPORTANT: deepcopy protects lists inside the dictionary
     future_state = deepcopy(current_state)
 
     if action_object.name == "End Turn":

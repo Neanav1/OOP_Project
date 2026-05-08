@@ -9,8 +9,8 @@ class Character:
         self._dice_to_roll = dice_to_roll
         self._rolls = []
         self._available_actions = {
-            "Basic_Strike": BasicStrike("Basic Strike"),
-            "Shield": Shield("Shield"),
+            #"Basic_Strike": BasicStrike("Basic Strike"),
+            #"Shield": Shield("Shield"),
             "End_turn": EndTurn("End Turn")
         }
         self._equipment = []

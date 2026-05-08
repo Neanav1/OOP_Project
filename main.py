@@ -38,6 +38,10 @@ def random_enemy(enemyList,stage):
     enemy = enemyList[enemyID].changeAtributes(stage)
     return enemy
 
+def options():
+    print("\n")
+    print("1.")
+
 player = Knight(25)
 enemy = Knight(25)
 player.equipt(BasicSword("Sword",None))
