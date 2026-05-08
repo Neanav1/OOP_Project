@@ -123,11 +123,12 @@ class Knight(Character):
 #Items
 class Item:
     
-    def __init__(self,name,requirement = None):
+    def __init__(self,name,requirement = None ):
         self.name = name
         self.requirement = requirement
         self.action_name = ""
         self.action = None
+        self.rarity = "" 
 
     def get_action(self):
         return self.action_name , self.action
@@ -138,6 +139,22 @@ class BasicSword(Item):
         super().__init__(name, requirement)
         self.action_name = "Basic_Strike"
         self.action = BasicStrike("Basic Strike")
+        self.rarity = "Common"
+
+#class Dagger(Item):
+#    def __init__(self, name, requirement):
+#        super().__init__(name, requirement)
+#        self.action_name = "QuickStab"
+#        self.action = QuickStab("Quick Stab")
+ #       self.rarity = "Common"
+
+class BasicShield(Item):
+    def __init__(self, name, requirement, ):
+        super().__init__(name, requirement)
+        self.action_name = "Shield"
+        self.action = Shield("Shield")
+        self.rarity = "Common"
+
 
     
     
@@ -156,6 +173,14 @@ class BasicStrike(Action):
 
     def action(self, dice):
         return dice, "Enemy"
+
+class QuickStab(Action): #(50% chance to do 2x damage)
+    def __init__(self, name):
+        super().__init__(name)
+
+    def action(self, dice):
+        return dice * 2, "Enemy"
+    
 
 
 class Shield(Action):
