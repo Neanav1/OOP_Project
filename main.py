@@ -1,5 +1,7 @@
-from character import Character, Knight, BasicSword
+from character import Character, Knight, BasicSword, BasicShield
 from enemy_ai import enemy_turn
+import random
+
 def player_turn(enemy,player):
     player.greet()
     dices = int(input("How many dices would you like to use: "))
@@ -31,39 +33,43 @@ def player_turn(enemy,player):
             player.add_action_points(-1)    
             player.use_dice(dice_ID-1)
 
+def random_enemy(enemyList,stage):
+    enemyID = random.randint(0,len(enemyList)-1)
+    enemy = enemyList[enemyID].changeAtributes(stage)
+    return enemy
+
 player = Knight(25)
 enemy = Knight(25)
 player.equipt(BasicSword("Sword",None))
 enemy.equipt(BasicSword("Sword",None))
+player.equipt(BasicShield("Shield",None))
+enemy.equipt(BasicShield("Shield",None))
+stage = -1
 
+enemyList = [Knight(25)]
 
-while player.get_hp() > 0 and enemy.get_hp() > 0:
-    player_turn(enemy, player)
+#run the game untill all of the enemies are dead or untill player is dead
+while player.get_hp()>0:
+    stage+=1
+    while player.get_hp() > 0 and enemy.get_hp() > 0:
+        player_turn(enemy, player)
 
-    if enemy.get_hp() <= 0:
-        break
+        if enemy.get_hp() <= 0:
+            break
 
-    enemy_turn(enemy, player)
+        enemy_turn(enemy, player)
 
-    if player.get_hp() <= 0:
-        break
+        if player.get_hp() <= 0:
+            break
 
-    player.add_action_points(1)
-    player.add_dice_to_roll(1)
+        player.add_action_points(1)
+        player.add_dice_to_roll(1)
 
-    enemy.add_action_points(1)
-    enemy.add_dice_to_roll(1)
+        enemy.add_action_points(1)
+        enemy.add_dice_to_roll(1)
 
 if player.get_hp()<= 0:
     print("You lost")
 if enemy.get_hp()<=0:
     print("You win")
         
-        
-
-
-
-
-
-
-

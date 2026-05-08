@@ -14,8 +14,17 @@ class Character:
             "End_turn": EndTurn("End Turn")
         }
         self._equipment = []
-        self.level = 1
+        self._level = 1
+        self._rolls_per_turn = 1
     
+    def changeAtributes(self,stage):
+        self.hp_change(stage * -1.3)
+        self.add_dice_to_roll(1*stage)
+        self.rolls_per_turn = 1*stage
+
+    def get_rolls_per_turn(self):
+        return self.rolls_per_turn
+
     def equipt(self,item):
         self._equipment.append(item)
         name , action = item.get_action()
@@ -58,7 +67,7 @@ class Character:
 
     def hp_change(self, number):
         """Positive number damages, negative number heals."""
-        self._hp -= number
+        self._hp -= round(number)
 
         if self._hp < 0:
             self._hp = 0
@@ -130,11 +139,9 @@ class BasicSword(Item):
         self.action_name = "Basic_Strike"
         self.action = BasicStrike("Basic Strike")
 
-class 
-
     
     
-
+#Actions
 class Action:
     def __init__(self, name):
         self.name = name
