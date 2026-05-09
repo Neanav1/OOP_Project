@@ -1,4 +1,4 @@
-from character import Character, Knight, BasicSword
+from character import Character, Knight, BasicSword, BasicShield
 from enemy_ai import enemy_turn
 import random
 
