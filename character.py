@@ -9,7 +9,6 @@ class Character:
         self._dice_to_roll = dice_to_roll
         self._rolls = []
         self._available_actions = {
-            #"Basic_Strike": BasicStrike("Basic Strike"),
             "Shield": Shield("Shield"),
             "End_turn": EndTurn("End Turn")
         }
@@ -17,6 +16,10 @@ class Character:
         self._level = 1
         self._rolls_per_turn = 1
     
+    def levelUp(self,system):
+        self._hp += (self._hp*self._level*system) - self._hp
+        self._rolls_per_turn += (self._level*system)
+
     def changeAtributes(self,stage):
         self.hp_change(stage * -1.3)
         self.add_dice_to_roll(1*stage)
@@ -119,7 +122,10 @@ class Knight(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
 
-
+class Tank(Character):
+    def __init__(self, hp, action_points=1, dice_to_roll=2):
+        super().__init__(hp, action_points, dice_to_roll)
+    pass
 #Items
 class Item:
     
@@ -159,6 +165,7 @@ class BasicShield(Item):
 class Action:
     def __init__(self, name):
         self.name = name
+        self.type = None
 
     def action(self, dice):
         return 0, "None"
@@ -186,7 +193,6 @@ class QuickStab(Action): #(50% chance to do 2x damage)
     def expected(self, dice):
         return dice * 1.5, "Enemy"
     
-
 
 class Shield(Action):
     def __init__(self, name):

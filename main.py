@@ -78,7 +78,7 @@ while player.get_hp()>0 or stage >= 8:
                 break
 
             player.add_action_points(1)
-            player.add_dice_to_roll(1)
+            player.add_dice_to_roll(player.get_rolls_per_turn())
 
             enemy.add_action_points(1+(0.5*stage))
             enemy.add_dice_to_roll(1)
