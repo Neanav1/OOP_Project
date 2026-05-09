@@ -19,35 +19,41 @@ def enemy_logic(enemy, player):
     }
 
     possible_actions = enemy.get_available_actions()
+    original_state = deepcopy(current_state)
 
-    best_score = float("-inf")
-    best_action_name = None
-    best_dice_index = None
+    def evaluate(state):
+        """Return (best_score, best_action_name, best_dice_index) from this state"""
+        best_score = float("-inf")
+        best_choice = (None, None)
 
-    for action_name, action_object in possible_actions.items():
+        actions = enemy.get_available_actions()
 
-        if action_name == "End_turn":
-            future_state = simulate(current_state, action_object, None)
-            score = score_state(current_state, future_state)
+        for action_name, action_object in actions.items():
+            if action_name == "End_turn":
+                fut = simulate(state, action_object, None)
+                score = score_state(original_state, fut)
+                if score > best_score:
+                    best_score = score
+                    best_choice = (action_name, None)
+                continue
 
-            if score > best_score:
-                best_score = score
-                best_action_name = action_name
-                best_dice_index = None
+            for dice_index in range(len(state["enemyRolls"])):
+                fut = simulate(state, action_object, dice_index)
 
-        else:
-            for dice_index in range(len(current_state["enemyRolls"])):
-
-                future_state = simulate(current_state, action_object, dice_index)
-
-                score = score_state(current_state, future_state)
+                if fut["enemyActionPoints"] > 0 and len(fut["enemyRolls"]) > 0:
+                    sub_score, _, _ = evaluate(fut)
+                    score = sub_score
+                else:
+                    score = score_state(original_state, fut)
 
                 if score > best_score:
                     best_score = score
-                    best_action_name = action_name
-                    best_dice_index = dice_index
+                    best_choice = (action_name, dice_index)
 
-    return best_action_name, best_dice_index
+        return best_score, best_choice[0], best_choice[1]
+
+    _, action_name, dice_index = evaluate(current_state)
+    return action_name, dice_index
 
 
 def simulate(current_state, action_object, dice_index):
@@ -55,12 +61,11 @@ def simulate(current_state, action_object, dice_index):
 
     if action_object.name == "End Turn":
         future_state["enemyActionPoints"] = 0
-        future_state["enemyDiceToRoll"] += 1
         return future_state
 
     dice = future_state["enemyRolls"][dice_index]
 
-    result, target = action_object.action(dice)
+    result, target = action_object.expected(dice)
 
     if target == "Enemy":
         damage = result
@@ -85,29 +90,29 @@ def simulate(current_state, action_object, dice_index):
 
 
 def score_state(current_state, future_state):
-    characters = ["defensive","agressive"]
-    char = random.randint(0,len(characters)-1)
-    current_char = characters[char]
-    if current_char == "defensive":
-        values = [0.8,1,2]
-    elif current_char == "agressive":
-        values = [1.2,0.8]
-
-    score = 0
-
     if future_state["playerHP"] <= 0:
-        score += 1000
+        return 10000
+
+    score = 0.0
 
     damage_done = current_state["playerHP"] - future_state["playerHP"]
-    score += damage_done * 20 * values[0]
+    score += damage_done * 50.0
 
     shield_damage = current_state["playerShield"] - future_state["playerShield"]
-    score += shield_damage * 5 * values[0]
+    score += shield_damage * 12.0
 
     shield_gained = future_state["enemyShield"] - current_state["enemyShield"]
-    score += shield_gained * 10 * values[1]
+    enemy_hp = current_state.get("enemyHP", 0)
+    player_hp = current_state.get("playerHP", 0)
 
-    score += future_state["enemyShield"] * 2 * values[0]
+    if enemy_hp <= max(1, player_hp * 0.5):
+        score += shield_gained * 25.0
+    else:
+        score += shield_gained * 10.0
+
+    score += future_state.get("enemyShield", 0) * 2.0
+
+    score += random.uniform(-2.0, 2.0)
 
     return score
 
@@ -119,8 +124,6 @@ def perform_enemy_action(enemy, player, action_name, dice_index):
     if action_name == "End_turn":
         print("Enemy ends the turn.")
         enemy.reduce_action_points(enemy.get_action_points())
-        enemy.add_action_points(1)
-        enemy.add_dice_to_roll(1)
         return
 
     if dice_index is None:

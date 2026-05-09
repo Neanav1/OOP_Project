@@ -141,12 +141,12 @@ class BasicSword(Item):
         self.action = BasicStrike("Basic Strike")
         self.rarity = "Common"
 
-#class Dagger(Item):
-#    def __init__(self, name, requirement):
-#        super().__init__(name, requirement)
-#        self.action_name = "QuickStab"
-#        self.action = QuickStab("Quick Stab")
- #       self.rarity = "Common"
+class Dagger(Item):
+    def __init__(self, name, requirement):
+        super().__init__(name, requirement)
+        self.action_name = "QuickStab"
+        self.action = QuickStab("Quick Stab")
+        self.rarity = "Common"
 
 class BasicShield(Item):
     def __init__(self, name, requirement, ):
@@ -162,6 +162,9 @@ class Action:
 
     def action(self, dice):
         return 0, "None"
+    
+    def expected(self, dice):
+        return self.action(dice)
 
 
 class BasicStrike(Action):
@@ -176,7 +179,12 @@ class QuickStab(Action): #(50% chance to do 2x damage)
         super().__init__(name)
 
     def action(self, dice):
-        return dice * 2, "Enemy"
+        if random.random() < 0.5:
+            return dice * 2, "Enemy"
+        return dice, "Enemy"
+
+    def expected(self, dice):
+        return dice * 1.5, "Enemy"
     
 
 
