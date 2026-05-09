@@ -157,26 +157,44 @@ class BasicShield(Item):
 
 #Actions
 class Action:
-    def __init__(self, name):
+    def __init__(self, name, damagetype = "None"):
         self.name = name
+        self.damagetype = damagetype
 
     def action(self, dice):
-        return 0, "None"
+        return 0, self.damagetype
     
     def expected(self, dice):
         return self.action(dice)
+    
 
 
 class BasicStrike(Action):
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__(name, damagetype= "Physical")
 
     def action(self, dice):
         return dice, "Enemy"
 
+
+class Fireslash(Action):
+    def __init__(self, name):
+        super().__init__(name, damagetype=  "Fire")
+
+    def action(self, dice):
+        return dice , "Enemy"
+
+class Iceslash(Action):
+    def __init__(self, name):
+        super().__init__(name, damagetype="ice")
+
+    def action(self, dice):
+        return dice*0.75, "Enemy"
+    #skip enemy turn (20%)
+    
 class QuickStab(Action): #(50% chance to do 2x damage)
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__(name, damagetype = "Physical")
 
     def action(self, dice):
         if random.random() < 0.5:
