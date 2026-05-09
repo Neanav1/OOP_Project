@@ -126,6 +126,11 @@ class Tank(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
     pass
+
+class Witch(Character):
+    def __init__(self, hp, action_points=1, dice_to_roll=2):
+        super().__init__(hp, action_points, dice_to_roll)
+    pass
 #Items
 class Item:
     
