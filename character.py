@@ -10,7 +10,7 @@ class Character:
         self._rolls = []
         self._available_actions = {
             #"Basic_Strike": BasicStrike("Basic Strike"),
-            #"Shield": Shield("Shield"),
+            "Shield": Shield("Shield"),
             "End_turn": EndTurn("End Turn")
         }
         self._equipment = []
@@ -138,8 +138,6 @@ class BasicSword(Item):
         super().__init__(name, requirement)
         self.action_name = "Basic_Strike"
         self.action = BasicStrike("Basic Strike")
-
-    
     
 #Actions
 class Action:

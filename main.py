@@ -1,4 +1,4 @@
-from character import Character, Knight, BasicSword, BasicShield
+from character import Character, Knight, BasicSword
 from enemy_ai import enemy_turn
 import random
 
@@ -35,45 +35,60 @@ def player_turn(enemy,player):
 
 def random_enemy(enemyList,stage):
     enemyID = random.randint(0,len(enemyList)-1)
-    enemy = enemyList[enemyID].changeAtributes(stage)
+    enemy = enemyList[enemyID]
+    enemy.changeAtributes(stage)
     return enemy
 
 def options():
     print("\n")
-    print("1.")
+    print("1.Fight")
+    print("2. Shop")
+    print("3. Inventory")
+    print("4. Exit")
 
 player = Knight(25)
 enemy = Knight(25)
 player.equipt(BasicSword("Sword",None))
 enemy.equipt(BasicSword("Sword",None))
-player.equipt(BasicShield("Shield",None))
-enemy.equipt(BasicShield("Shield",None))
-stage = -1
+stage = 2
 
 enemyList = [Knight(25)]
 
 #run the game untill all of the enemies are dead or untill player is dead
 while player.get_hp()>0:
-    stage+=1
-    while player.get_hp() > 0 and enemy.get_hp() > 0:
-        player_turn(enemy, player)
+    
+    options()
+    option = int(input("Select an action: "))
+    if option == 1:
+        stage+=1
+        enemy = random_enemy(enemyList,stage)
+        while player.get_hp() > 0 and enemy.get_hp() > 0:
+            player_turn(enemy, player)
 
-        if enemy.get_hp() <= 0:
-            break
+            if enemy.get_hp() <= 0:
+                break
 
-        enemy_turn(enemy, player)
+            enemy_turn(enemy, player)
 
-        if player.get_hp() <= 0:
-            break
+            if player.get_hp() <= 0:
+                break
 
-        player.add_action_points(1)
-        player.add_dice_to_roll(1)
+            player.add_action_points(1)
+            player.add_dice_to_roll(1)
 
-        enemy.add_action_points(1)
-        enemy.add_dice_to_roll(1)
+            enemy.add_action_points(1)
+            enemy.add_dice_to_roll(1)
 
-if player.get_hp()<= 0:
-    print("You lost")
-if enemy.get_hp()<=0:
-    print("You win")
-        
+    if player.get_hp()<= 0:
+        print("You lost")
+        break
+    if enemy.get_hp()<=0:
+        print("You win")
+    elif option == 2:
+        print("shop")
+    elif option == 3:
+        print("Inventory")
+    elif option == 4:
+        break
+    else:
+        print("Incorrect input")
