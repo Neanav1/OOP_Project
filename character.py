@@ -2,8 +2,9 @@ import random
 
 
 class Character:
-    def __init__(self, hp, action_points=1, dice_to_roll=2):
+    def __init__(self, hp, action_points=1, dice_to_roll=2, d =6):
         self._hp = hp
+        self._d = d
         self._shield = 0
         self._action_points = action_points
         self._dice_to_roll = dice_to_roll
@@ -42,7 +43,7 @@ class Character:
             number = self._dice_to_roll
 
         for i in range(number):
-            self._rolls.append(random.randint(1, 6))
+            self._rolls.append(random.randint(1, self._d))
 
         self._dice_to_roll -= number
 
@@ -128,9 +129,11 @@ class Tank(Character):
     pass
 
 class Witch(Character):
-    def __init__(self, hp, action_points=1, dice_to_roll=2):
-        super().__init__(hp, action_points, dice_to_roll)
-    pass
+    def __init__(self, hp, action_points=1, dice_to_roll=3, d=4):
+        super().__init__(hp, action_points, dice_to_roll, d)
+        
+    
+    
 #Items
 class Item:
     
@@ -159,6 +162,12 @@ class Dagger(Item):
         self.action = QuickStab("Quick Stab")
         self.rarity = "Common"
 
+class Firestaff(Item):
+    def __init__(self, name, requirement):
+        super().__init__(name, requirement)
+        self.action_name = "Fireball"
+        self.action = Fireball("Fireball")
+        self.rarity = "Common"
 class BasicShield(Item):
     def __init__(self, name, requirement, ):
         super().__init__(name, requirement)
@@ -179,6 +188,13 @@ class Action:
     
 
 
+
+class Fireball(Action):
+    def __init__(self, name):
+        super().__init__(name, damagetype= "Fire")
+
+    def action(self, dice):
+        return dice*2, "Enemy"
 class BasicStrike(Action):
     def __init__(self, name):
         super().__init__(name, damagetype= "Physical")
@@ -201,6 +217,7 @@ class Iceslash(Action):
     def action(self, dice):
         return dice*0.75, "Enemy"
     #skip enemy turn (20%)
+
     
 class QuickStab(Action): #(50% chance to do 2x damage)
     def __init__(self, name):
