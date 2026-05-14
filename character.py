@@ -16,6 +16,8 @@ class Character:
         self._equipment = []
         self._level = 1
         self._rolls_per_turn = 1
+        self._buffs = []
+        self._debuffs = []
     
     def levelUp(self,system):
         self._level +=1
