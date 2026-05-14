@@ -1,4 +1,4 @@
-from character import Character, Knight, BasicSword, BasicShield
+from character import *
 from enemy_ai import enemy_turn
 import random
 from character import Dagger
@@ -26,7 +26,7 @@ def player_turn(enemy,player):
         value, target = actions[action_id].action(dice_value)
 
         if target == "End":
-            player.reduce_action_points(player.get_action_points())
+            #player.reduce_action_points(player.get_action_points())
             break
 
         if target == "Enemy":
@@ -41,7 +41,10 @@ def player_turn(enemy,player):
 def random_enemy(enemyList,stage):
     enemyID = random.randint(0, len(enemyList)-1)
     enemy = enemyList[enemyID]
-    enemyWeapon = random.choice([BasicSword("Sword", None), Dagger("Dagger", None)])
+    if isinstance(enemy,Knight):
+        enemyWeapon = random.choice([BasicSword("Sword", None), Dagger("Dagger", None)])
+    if isinstance(enemy,Witch):
+        enemyWeapon = random.choice([Firestaff("FireStaff", None),Icestaff("Icestaff", None)])
     enemy.equipt(enemyWeapon)
     enemy.changeAtributes(stage)
     return enemy
@@ -53,11 +56,11 @@ def options():
     print("3. Inventory")
     print("4. Exit")
 
-player = Knight(250)
+player = Knight(25)
 player.equipt(BasicSword("Sword",None))
-stage = -1
+stage = 4
 
-enemyList = [Knight(25,4)]
+enemyList = [Knight(25),Witch(15)]
 
 while player.get_hp()>0 or stage >= 8:
     
@@ -66,6 +69,8 @@ while player.get_hp()>0 or stage >= 8:
     if option == 1:
         stage+=1
         enemy = random_enemy(enemyList,stage)
+        if stage>=1:
+            player.levelUp(player.system)
         while player.get_hp() > 0 and enemy.get_hp() > 0:
             player_turn(enemy, player)
 
@@ -77,7 +82,7 @@ while player.get_hp()>0 or stage >= 8:
             if player.get_hp() <= 0:
                 break
 
-            player.add_action_points(1)
+            player.add_action_points(1+(0.5*stage))
             player.add_dice_to_roll(player.get_rolls_per_turn())
 
             enemy.add_action_points(1+(0.5*stage))

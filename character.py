@@ -18,16 +18,17 @@ class Character:
         self._rolls_per_turn = 1
     
     def levelUp(self,system):
-        self._hp += (self._hp*self._level*system) - self._hp
-        self._rolls_per_turn += (self._level*system)
+        self._level +=1
+        self._hp += round(self._hp*self._level*system[0]) - self._hp
+        self._rolls_per_turn += round(self._level*system[1])
 
     def changeAtributes(self,stage):
-        self.hp_change(stage * -1.3)
+        self._hp += round(self._hp*self._level*1.3) - self._hp
         self.add_dice_to_roll(1*stage)
         self.rolls_per_turn = 1*stage
 
     def get_rolls_per_turn(self):
-        return self.rolls_per_turn
+        return self._rolls_per_turn
 
     def equipt(self,item):
         self._equipment.append(item)
@@ -120,25 +121,18 @@ class Character:
 
 
 class Knight(Character):
-    def __init__(self, hp, action_points=1, dice_to_roll=2, d=6):
-        super().__init__(hp, action_points, dice_to_roll, d )
+    def __init__(self, hp, action_points=1, dice_to_roll=2):
+        super().__init__(hp, action_points, dice_to_roll)
 
 class Tank(Character):
-    def __init__(self, hp, action_points=1, dice_to_roll=2, d=6):
-        super().__init__(hp, action_points, dice_to_roll, d)
+    def __init__(self, hp, action_points=1, dice_to_roll=2):
+        super().__init__(hp, action_points, dice_to_roll)
     pass
 
 class Witch(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=3, d=4):
         super().__init__(hp, action_points, dice_to_roll, d)
-
-class Brawler(Character):
-    def __init__(self, hp, action_points=1, dice_to_roll=2, d=6):
-        super().__init__(hp, action_points, dice_to_roll, d)
-
-
-
-
+        
     
     
 #Items
@@ -173,6 +167,13 @@ class Dagger(Item):
         super().__init__(name, requirement)
         self.action_name = "QuickStab"
         self.action = QuickStab("Quick Stab")
+        self.rarity = "Common"
+
+class Icestaff(Item):
+    def __init__(self, name, requirement=None):
+        super().__init__(name, requirement)
+        self.action_name = "Iceslash"
+        self.action = Iceslash("Iceslash")
         self.rarity = "Common"
 
 class Firestaff(Item):
@@ -251,8 +252,11 @@ class Iceslash(Action):
         super().__init__(name, damagetype="ice")
 
     def action(self, dice):
-        return dice*0.75, "Enemy"
-    #skip enemy turn (20%)
+        if random.random() < 0.2:
+            #return Stun("Stun"), "Enemy"
+            pass
+        else:
+            return round(dice*0.75), "Enemy"
 
     
 class QuickStab(Action): #(50% chance to do 2x damage)
@@ -266,7 +270,14 @@ class QuickStab(Action): #(50% chance to do 2x damage)
 
     def expected(self, dice):
         return dice * 1.5, "Enemy"
-    
+
+class Stun(Action):
+    def __init__(self, name, damagetype="None"):
+        super().__init__(name, damagetype)
+
+        def action(self):
+            return 1, "Stun"
+            
 
 class Shield(Action):
     def __init__(self, name):
