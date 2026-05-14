@@ -2,12 +2,12 @@ import random
 
 
 class Character:
-    def __init__(self, hp, action_points=1, dice_to_roll=2, d =6):
+    def __init__(self, hp, action_points=1, dice_to_roll=2, d =6 ):
         self._hp = hp
         self._d = d
         self._shield = 0
         self._action_points = action_points
-        self._dice_to_roll = dice_to_roll
+        self._dice_to_roll = dice_to_roll 
         self._rolls = []
         self._available_actions = {
             "Shield": Shield("Shield"),
@@ -125,27 +125,17 @@ class Character:
 class Knight(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
-        self.system = [1.3,1.5]
 
 class Tank(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
-        self.system = [1.5,1.5]
-    
-    def changeAtributes(self, stage):
-        self._hp += round(self._hp*self._level*1.5) - self._hp
-        self.add_dice_to_roll(1*stage)
-        self.rolls_per_turn = 1*stage
+    pass
 
 class Witch(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=3, d=4):
         super().__init__(hp, action_points, dice_to_roll, d)
-        self._rolls_per_turn = 2
-
-    def changeAtributes(self, stage):
-        self._hp += round(self._hp*self._level*1.15) - self._hp
-        self.add_dice_to_roll(1*stage)
-        self.rolls_per_turn = 1*stage
+        
+    
     
 #Items
 class Item:
@@ -168,6 +158,12 @@ class BasicSword(Item):
         self.action = BasicStrike("Basic Strike")
         self.rarity = "Common"
 
+class HolySword(Item):
+    def __init__(self, name, requirement):
+        super.__init__(name, requirement)
+        self.action_name = "Holy_Strike"
+        self.action = Holy_Strike("Holy Strike") 
+        self.rarity = "Rare"
 class Dagger(Item):
     def __init__(self, name, requirement):
         super().__init__(name, requirement)
@@ -188,6 +184,13 @@ class Firestaff(Item):
         self.action_name = "Fireball"
         self.action = Fireball("Fireball")
         self.rarity = "Common"
+
+class Knuckle_Dusters(Item):
+    def __init__(self, name, requirement):
+        super().__init__(name, requirement)
+        self.action_name = "Metal fist"
+        self.action = Metal_fist("Metal Fist")
+        self.rarity = "Common"
 class BasicShield(Item):
     def __init__(self, name, requirement, ):
         super().__init__(name, requirement)
@@ -199,9 +202,10 @@ class BasicShield(Item):
 class Action:
     def __init__(self, name, damagetype = "None"):
         self.name = name
+        self.damagetype = damagetype
 
     def action(self, dice):
-        return 0, self.damagetype
+        return dice, self.damagetype
     
     def expected(self, dice):
         return self.action(dice)
@@ -209,6 +213,21 @@ class Action:
 
 
 
+class Holy_Strike(Action):
+     def __init__(self, name):
+        super().__init__(name, damagetype= "Physical")
+
+     def action(self, dice):
+        return dice, "Enemy"
+     def action(self, dice):
+        return dice*0.5, "Self"
+         
+class Metal_fist(Action):
+     def __init__(self, name):
+        super().__init__(name, damagetype= "Physical")
+
+     def action(self, dice):
+        return dice, "Enemy"
 class Fireball(Action):
     def __init__(self, name):
         super().__init__(name, damagetype= "Fire")
