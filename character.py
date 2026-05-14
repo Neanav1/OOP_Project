@@ -14,6 +14,7 @@ class Character:
             "End_turn": EndTurn("End Turn")
         }
         self._equipment = []
+        self.inventory = []
         self._level = 1
         self._rolls_per_turn = 1
         self._buffs = []
@@ -36,6 +37,9 @@ class Character:
         self._equipment.append(item)
         name , action = item.get_action()
         self.add_avalable_action(name,action)
+
+    def get_equipment(self):
+        return self._equipment
 
     def unequipt(self,item):
         self._equipment.remove(item)
@@ -181,8 +185,6 @@ class Dagger(Item):
         self.action = QuickStab("Quick Stab")
         self.rarity = "Common"
 
-
-#pls see me 
 class Icestaff(Item):
     def __init__(self, name, requirement=None):
         super().__init__(name, requirement)
@@ -307,3 +309,10 @@ class EndTurn(Action):
 
     def action(self, dice=None):
         return 0, "End"
+    
+class Rock(Action):
+    def __init__(self, name, damagetype="None"):
+        super().__init__(name, damagetype)
+    
+    def action(self, dice=None):
+        return 0, "Enemy"
