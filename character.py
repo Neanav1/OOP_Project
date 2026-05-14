@@ -125,16 +125,26 @@ class Character:
 class Knight(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
-
+        self.system = [1.3,1.5]
 class Tank(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
         super().__init__(hp, action_points, dice_to_roll)
-    pass
+        self.system = [1.5,1.5]
+    
+    def changeAtributes(self, stage):
+        self._hp += round(self._hp*self._level*1.5) - self._hp
+        self.add_dice_to_roll(1*stage)
+        self.rolls_per_turn = 1*stage
 
 class Witch(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=3, d=4):
         super().__init__(hp, action_points, dice_to_roll, d)
-        
+        self._rolls_per_turn = 2
+
+    def changeAtributes(self, stage):
+        self._hp += round(self._hp*self._level*1.15) - self._hp
+        self.add_dice_to_roll(1*stage)
+        self.rolls_per_turn = 1*stage
     
     
 #Items
