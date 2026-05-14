@@ -38,9 +38,6 @@ class Character:
         name , action = item.get_action()
         self.add_avalable_action(name,action)
 
-    def get_equipment(self):
-        return self._equipment
-
     def unequipt(self,item):
         self._equipment.remove(item)
 
@@ -185,6 +182,8 @@ class Dagger(Item):
         self.action = QuickStab("Quick Stab")
         self.rarity = "Common"
 
+
+#pls see me 
 class Icestaff(Item):
     def __init__(self, name, requirement=None):
         super().__init__(name, requirement)
@@ -269,8 +268,8 @@ class Iceslash(Action):
 
     def action(self, dice):
         if random.random() < 0.2:
-            #return Stun("Stun"), "Enemy"
-            pass
+            return Stun("Stun"), "Enemy"
+            
         else:
             return round(dice*0.75), "Enemy"
 
@@ -309,10 +308,3 @@ class EndTurn(Action):
 
     def action(self, dice=None):
         return 0, "End"
-    
-class Rock(Action):
-    def __init__(self, name, damagetype="None"):
-        super().__init__(name, damagetype)
-    
-    def action(self, dice=None):
-        return 0, "Enemy"
