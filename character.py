@@ -19,6 +19,7 @@ class Character:
         self._rolls_per_turn = 1
         self._buffs = []
         self._debuffs = []
+        self._stun_turns = 0
     
     def levelUp(self,system):
         self._level +=1
@@ -28,7 +29,7 @@ class Character:
     def changeAtributes(self,stage):
         self._hp += round(self._hp*self._level*1.3) - self._hp
         self.add_dice_to_roll(1*stage)
-        self.rolls_per_turn = 1*stage
+        self._rolls_per_turn = 1*stage
 
     def get_rolls_per_turn(self):
         return self._rolls_per_turn
@@ -89,6 +90,11 @@ class Character:
     def add_action_points(self, number=1):
         self._action_points += number
 
+    
+    def get_equipment(self):
+        return self._equipment
+
+
     def add_dice_to_roll(self, number=1):
         self._dice_to_roll += number
 
@@ -122,6 +128,41 @@ class Character:
         print(f"Rolled dice: {self._rolls}")
         print("------------------------------------------")
 
+    def process_debuffs(self):
+        """Apply active debuffs at the start of a turn. Returns True if stunned."""
+        stunned = False
+
+        remaining = []
+        for d in self._debuffs:
+            name = d.get("name")
+            value = d.get("value", 0)
+            turns = d.get("turns", 0)
+
+            if name == "Burn":
+                self.hp_change(value)
+
+            if turns - 1 > 0:
+                d["turns"] = turns - 1
+                remaining.append(d)
+
+        self._debuffs = remaining
+
+        if getattr(self, "_stun_turns", 0) > 0:
+            stunned = True
+            self._stun_turns -= 1
+
+        return stunned
+
+    def add_debuff(self, name, value=0, turns=1):
+        """Add a debuff to this character. Stun is tracked as turns on the character."""
+        if name == "Stun":
+            self._stun_turns = getattr(self, "_stun_turns", 0) + turns
+            return
+        self._debuffs.append({"name": name, "value": value, "turns": turns})
+
+    def is_stunned(self):
+        return getattr(self, "_stun_turns", 0) > 0
+
 
 class Knight(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=2):
@@ -135,7 +176,7 @@ class Tank(Character):
     def changeAtributes(self, stage):
         self._hp += round(self._hp*self._level*1.5) - self._hp
         self.add_dice_to_roll(1*stage)
-        self.rolls_per_turn = 1*stage
+        self._rolls_per_turn = 1*stage
 
 class Witch(Character):
     def __init__(self, hp, action_points=1, dice_to_roll=3, d=4):
@@ -145,7 +186,7 @@ class Witch(Character):
     def changeAtributes(self, stage):
         self._hp += round(self._hp*self._level*1.15) - self._hp
         self.add_dice_to_roll(1*stage)
-        self.rolls_per_turn = 1*stage
+        self._rolls_per_turn = 1*stage
     
     
 #Items
@@ -171,7 +212,7 @@ class BasicSword(Item):
 
 class HolySword(Item):
     def __init__(self, name, requirement):
-        super.__init__(name, requirement)
+        super().__init__(name, requirement)
         self.action_name = "Holy_Strike"
         self.action = Holy_Strike("Holy Strike") 
         self.rarity = "Rare"
@@ -182,8 +223,6 @@ class Dagger(Item):
         self.action = QuickStab("Quick Stab")
         self.rarity = "Common"
 
-
-#pls see me 
 class Icestaff(Item):
     def __init__(self, name, requirement=None):
         super().__init__(name, requirement)
@@ -227,13 +266,11 @@ class Action:
 
 
 class Holy_Strike(Action):
-     def __init__(self, name):
-        super().__init__(name, damagetype= "Physical")
+      def __init__(self, name):
+          super().__init__(name, damagetype= "Physical")
 
-     def action(self, dice):
-        return dice, "Enemy"
-     def action(self, dice):
-        return dice*0.5, "Self"
+      def action(self, dice):
+          return dice, "Enemy+Self"
          
 class Metal_fist(Action):
      def __init__(self, name):
@@ -246,7 +283,7 @@ class Fireball(Action):
         super().__init__(name, damagetype= "Fire")
 
     def action(self, dice):
-        return dice*2, "Enemy"
+        return round(dice * 1.5), "Enemy+Burn"
 class BasicStrike(Action):
     def __init__(self, name):
         super().__init__(name, damagetype= "Physical")
@@ -267,11 +304,10 @@ class Iceslash(Action):
         super().__init__(name, damagetype="ice")
 
     def action(self, dice):
-        if random.random() < 0.2:
-            return Stun("Stun"), "Enemy"
-            
-        else:
-            return round(dice*0.75), "Enemy"
+       
+        if random.random() < 0.25:
+            return 1, "Stun"
+        return round(dice*0.75), "Enemy"
 
     
 class QuickStab(Action): #(50% chance to do 2x damage)
@@ -289,9 +325,8 @@ class QuickStab(Action): #(50% chance to do 2x damage)
 class Stun(Action):
     def __init__(self, name, damagetype="None"):
         super().__init__(name, damagetype)
-
-        def action(self):
-            return 1, "Stun"
+    def action(self, dice=None):
+        return 1, "Stun"
             
 
 class Shield(Action):
@@ -308,3 +343,11 @@ class EndTurn(Action):
 
     def action(self, dice=None):
         return 0, "End"
+    
+class Rock(Action):
+    def __init__(self, name, damagetype="None"):
+        super().__init__(name, damagetype)
+    
+    def action(self, dice=None):
+        # very small damage rock
+        return 1, "Enemy"

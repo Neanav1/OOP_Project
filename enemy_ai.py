@@ -16,6 +16,9 @@ def enemy_logic(enemy, player):
         "playerDiceToRoll": player.get_dice_to_roll(),
 
         "playerRolls": player.get_rolls().copy()
+        ,
+        "playerStunTurns": getattr(player, "_stun_turns", 0),
+        "playerBurn": 0
     }
 
     possible_actions = enemy.get_available_actions()
@@ -63,11 +66,17 @@ def simulate(current_state, action_object, dice_index):
         future_state["enemyActionPoints"] = 0
         return future_state
 
-    dice = future_state["enemyRolls"][dice_index]
 
+    dice = future_state["enemyRolls"][dice_index]
     result, target = action_object.expected(dice)
 
-    if target == "Enemy":
+    if isinstance(target, str) and "+" in target:
+        primary, secondary = target.split("+", 1)
+    else:
+        primary = target
+        secondary = None
+
+    if primary == "Enemy":
         damage = result
 
         if future_state["playerShield"] >= damage:
@@ -80,8 +89,17 @@ def simulate(current_state, action_object, dice_index):
             if future_state["playerHP"] < 0:
                 future_state["playerHP"] = 0
 
-    elif target == "Self":
+        if secondary == "Burn":
+            burn_val = max(1, round(result * 0.2))
+            future_state["playerBurn"] = future_state.get("playerBurn", 0) + burn_val
+            future_state["playerHP"] -= burn_val
+            if future_state["playerHP"] < 0:
+                future_state["playerHP"] = 0
+
+    elif primary == "Self":
         future_state["enemyShield"] += result
+    elif primary == "Stun":
+        future_state["playerStunTurns"] = future_state.get("playerStunTurns", 0) + 1
 
     future_state["enemyRolls"].pop(dice_index)
     future_state["enemyActionPoints"] -= 1
@@ -112,6 +130,14 @@ def score_state(current_state, future_state):
 
     score += future_state.get("enemyShield", 0) * 2.0
 
+    stun_gain = future_state.get("playerStunTurns", 0) - current_state.get("playerStunTurns", 0)
+    if stun_gain > 0:
+        score += stun_gain * 100.0
+
+    burn_gain = future_state.get("playerBurn", 0) - current_state.get("playerBurn", 0)
+    if burn_gain > 0:
+        score += burn_gain * 20.0
+
     score += random.uniform(-2.0, 2.0)
 
     return score
@@ -138,19 +164,43 @@ def perform_enemy_action(enemy, player, action_name, dice_index):
 
     result, target = action_object.action(dice)
 
-    if target == "Enemy":
+    primary = target
+    secondary = None
+    if isinstance(target, str) and "+" in target:
+        primary, secondary = target.split("+", 1)
+
+    if primary == "Enemy":
         print(f"Enemy uses {action_name} with dice {dice}. It deals {result} damage.")
         player.take_damage(result)
+        if secondary == "Burn":
+            burn_val = max(1, round(result * 0.2))
+            print(f" -> applies Burn for {burn_val} per turn.")
+            player.add_debuff("Burn", burn_val, turns=2)
 
-    elif target == "Self":
+    elif primary == "Self":
         print(f"Enemy uses {action_name} with dice {dice}. It gains {result} shield.")
         enemy.add_shield(result)
 
+    elif primary == "Stun":
+        print(f"Enemy uses {action_name} and attempts to stun the player.")
+        player.add_debuff("Stun", 0, turns=1)
+
+    elif primary == "Enemy+Self":
+        print(f"Enemy uses {action_name} with dice {dice}. It deals {result} and gains partial shield.")
+        player.take_damage(result)
+        enemy.add_shield(max(1, round(result * 0.3)))
     enemy.reduce_action_points(1)
 
 
 def enemy_turn(enemy, player):
     print("\n--- Enemy Turn ---")
+
+    if hasattr(enemy, "process_debuffs"):
+        stunned = enemy.process_debuffs()
+        if stunned:
+            print("Enemy is stunned and skips its turn.")
+            enemy.reduce_action_points(enemy.get_action_points())
+            return
 
     if len(enemy.get_rolls()) == 0 and enemy.get_dice_to_roll() > 0:
         enemy.roll_dices(enemy.get_dice_to_roll())

@@ -4,6 +4,13 @@ import random
 from character import Dagger
 
 def player_turn(enemy,player):
+    if hasattr(player, "process_debuffs"):
+        stunned = player.process_debuffs()
+        if stunned:
+            print("Player is stunned and skips their turn.")
+            player.reduce_action_points(player.get_action_points())
+            return
+
     player.greet()
     dices = int(input("How many dices would you like to use: "))
     while player.get_action_points() > 0:
@@ -23,17 +30,33 @@ def player_turn(enemy,player):
             continue
 
         dice_value = player.get_rolls()[dice_ID-1]
+
         value, target = actions[action_id].action(dice_value)
 
-        if target == "End":
-            #player.reduce_action_points(player.get_action_points())
+        primary = target
+        secondary = None
+        if isinstance(target, str) and "+" in target:
+            primary, secondary = target.split("+", 1)
+
+        if primary == "End":
+            player.reduce_action_points(player.get_action_points())
             break
 
-        if target == "Enemy":
+        if primary == "Enemy":
             enemy.take_damage(value)
+            if secondary == "Burn":
+                burn_val = max(1, round(value * 0.2))
+                enemy.add_debuff("Burn", burn_val, turns=2)
 
-        elif target == "Self":
+        elif primary == "Self":
             player.add_shield(value)
+
+        elif primary == "Stun":
+            enemy.add_debuff("Stun", 0, turns=1)
+
+        elif primary == "Enemy+Self":
+            enemy.take_damage(value)
+            player.add_shield(max(1, round(value * 0.3)))
 
         player.reduce_action_points(1)
         player.use_dice(dice_ID-1)
@@ -57,7 +80,7 @@ def options():
     print("4. Exit")
 
 def random_award():
-    rewards = [Dagger("Dagger", None),BasicSword("Sword", None),Holy_Strike("HolyStrike",None),Rock("Rock",None)]
+    rewards = [Dagger("Dagger", None),BasicSword("Sword", None),HolySword("HolyStrike", None),Rock("Rock", None),Icestaff("Icestaff", None),Firestaff("FireStaff", None)]
     rewardID = random.randint(0, len(rewards)-1)
     return rewards[rewardID]
 
