@@ -143,21 +143,20 @@ class Character:
         print("------------------------------------------")
 
     def process_debuffs(self):
-        """Apply active debuffs at the start of a turn. Returns True if stunned."""
         stunned = False
 
         remaining = []
-        for d in self._debuffs:
-            name = d.get("name")
-            value = d.get("value", 0)
-            turns = d.get("turns", 0)
+        for i in self._debuffs:
+            name = i.get("name")
+            value = i.get("value", 0)
+            turns = i.get("turns", 0)
 
             if name == "Burn":
                 self.hp_change(value)
 
             if turns - 1 > 0:
-                d["turns"] = turns - 1
-                remaining.append(d)
+                i["turns"] = turns - 1
+                remaining.append(i)
 
         self._debuffs = remaining
 
