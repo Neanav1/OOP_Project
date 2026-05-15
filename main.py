@@ -84,11 +84,11 @@ def random_award():
     rewardID = random.randint(0, len(rewards)-1)
     return rewards[rewardID]
 
-player = Knight(25)
+player = Knight(20)
 player.equipt(BasicSword("Sword",None))
-stage = 4
-
-enemyList = [Knight(25),Witch(15)]
+stage = 0
+player.changelvl()
+enemyList = [Knight(23),Witch(15)]
 
 while player.get_hp()>0 or stage >= 8:
     
@@ -123,8 +123,21 @@ while player.get_hp()>0 or stage >= 8:
             break
         if enemy.get_hp()<=0:
             print("You win")
+            player.get_coins(random.randint(2*stage,3*stage))
     elif option == 2:
-        print("shop")
+        print("Welcome to a Shop")
+        print(f"You can buy {stage} this many items")
+        shopItems = []
+        if stage >0:
+            for j in range(stage):
+                shopItems.append((random_award(),random.randint(1+stage,3*stage)))
+            for i in range(stage):
+
+                print(f"{i+1}. {shopItems[i][0]} cost {shopItems[i][1]}")
+            ID = int(input("Enter the id of the Item: "))
+            if shopItems[ID-1][1] - player.get_coins() >=0:
+                player.inventory.append(shopItems[ID-1][1])
+                player.sub_Coins(shopItems[ID-1][1])
     elif option == 3:
         print("Inventory")
         print(f"Player's equipt item: {player.get_equipment()}")

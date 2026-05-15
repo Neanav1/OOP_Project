@@ -20,7 +20,11 @@ class Character:
         self._buffs = []
         self._debuffs = []
         self._stun_turns = 0
+        self._coins = 0
     
+    def changelvl(self):
+        self._level -=1
+
     def levelUp(self,system):
         self._level +=1
         self._hp += round(self._hp*self._level*system[0]) - self._hp
@@ -33,6 +37,16 @@ class Character:
 
     def get_rolls_per_turn(self):
         return self._rolls_per_turn
+
+    def get_coins(self):
+        return self._coins
+    
+    def add_coins(self,value):
+        self._coins += value
+
+    def sub_Coins(self,value):
+        self._coins -= value
+
 
     def equipt(self,item):
         self._equipment.append(item)
@@ -349,5 +363,4 @@ class Rock(Action):
         super().__init__(name, damagetype)
     
     def action(self, dice=None):
-        # very small damage rock
         return 1, "Enemy"
